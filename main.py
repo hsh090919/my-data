@@ -49,25 +49,25 @@ def load_data():
     # 열 이름 앞뒤 공백 제거
     df.columns = df.columns.str.strip()
 
-    # 날짜 데이터 변환
+    # 날짜를 날짜 형식으로 변환
     df["날짜"] = pd.to_datetime(
         df["날짜"],
         errors="coerce"
     )
 
-    # 평균기온 숫자로 변환
+    # 평균기온을 숫자로 변환
     df["평균기온"] = pd.to_numeric(
         df["평균기온"],
         errors="coerce"
     )
 
-    # 최저기온 숫자로 변환
+    # 최저기온을 숫자로 변환
     df["최저기온"] = pd.to_numeric(
         df["최저기온"],
         errors="coerce"
     )
 
-    # 최고기온 숫자로 변환
+    # 최고기온을 숫자로 변환
     df["최고기온"] = pd.to_numeric(
         df["최고기온"],
         errors="coerce"
@@ -92,15 +92,12 @@ def load_data():
 # ==================================
 
 try:
-
     df = load_data()
 
 except Exception as e:
 
     st.error("데이터를 불러오는 중 오류가 발생했습니다.")
-
     st.exception(e)
-
     st.stop()
 
 
@@ -115,7 +112,7 @@ st.write(
 )
 
 
-# 분석할 열 선택
+# 분석할 기온 열
 temperature_columns = [
     "평균기온",
     "최저기온",
@@ -275,7 +272,7 @@ st.subheader("📈 연도별 연평균기온 변화")
 
 st.write(
     "각 점은 해당 연도의 평균기온입니다. "
-    "관측 데이터가 없는 연도는 선을 임의로 연결하지 않습니다."
+    "관측 데이터가 없는 연도는 빈 값으로 유지됩니다."
 )
 
 
@@ -285,7 +282,7 @@ fig, ax = plt.subplots(
 )
 
 
-# 선 + 연도별 점 표시
+# 연도별 연평균기온 선과 점
 ax.plot(
     yearly_temp["연도"],
     yearly_temp["평균기온"],
@@ -295,16 +292,38 @@ ax.plot(
 )
 
 
-# 격자 표시
+# ==================================
+# 모눈종이 형태의 격자
+# ==================================
+
+# 큰 격자
 ax.grid(
     True,
-    linestyle="--",
-    alpha=0.5
+    which="major",
+    linestyle="-",
+    alpha=0.4
 )
 
 
-# 그래프 내부 글자
-# Streamlit Cloud에서 한글 폰트 깨짐 방지
+# 작은 격자 활성화
+ax.minorticks_on()
+
+
+# 작은 격자
+ax.grid(
+    True,
+    which="minor",
+    linestyle="--",
+    alpha=0.2
+)
+
+
+# ==================================
+# 그래프 제목과 축 이름
+# ==================================
+
+# 그래프 내부 글자는 영어로 설정
+# Streamlit Cloud의 한국어 글꼴 문제 방지
 
 ax.set_title(
     "Seoul Annual Average Temperature",
